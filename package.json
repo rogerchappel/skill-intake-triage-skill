@@ -22,5 +22,13 @@
     "dry-run"
   ],
   "author": "Roger Chappel",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogerchappel/skill-intake-triage-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rogerchappel/skill-intake-triage-skill/issues"
+  },
+  "homepage": "https://github.com/rogerchappel/skill-intake-triage-skill#readme"
 }
