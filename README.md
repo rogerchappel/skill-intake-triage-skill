@@ -31,3 +31,13 @@ The tool is read-only. Treat any external write, publish, approval, install, or 
 ## Release Candidate
 
 See `docs/RELEASE_CANDIDATE.md` and `docs/RELEASE_CHECKLIST.md` for the current readiness notes.
+
+## Local Verification
+
+```sh
+npm run check
+npm test
+npm run smoke
+npm run package:smoke
+npm run release:check
+```
