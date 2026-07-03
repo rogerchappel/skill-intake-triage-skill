@@ -30,5 +30,14 @@
   "bugs": {
     "url": "https://github.com/rogerchappel/skill-intake-triage-skill/issues"
   },
-  "homepage": "https://github.com/rogerchappel/skill-intake-triage-skill#readme"
+  "homepage": "https://github.com/rogerchappel/skill-intake-triage-skill#readme",
+  "files": [
+    "bin",
+    "src",
+    "fixtures",
+    "scripts",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md"
+  ]
 }
