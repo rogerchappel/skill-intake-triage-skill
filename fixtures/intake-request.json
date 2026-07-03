@@ -1,0 +1,30 @@
+{
+  "request": "Please prepare a repo launch post from README.md and docs/PRD.md, but do not publish it.",
+  "catalog": [
+    {
+      "name": "repo-to-content-skill",
+      "description": "Generate launch content from repository docs",
+      "triggers": [
+        "repo",
+        "launch",
+        "post",
+        "README"
+      ],
+      "requiredInputs": [
+        "README.md"
+      ],
+      "sideEffects": "Drafting only; publishing requires approval."
+    },
+    {
+      "name": "connector-router",
+      "description": "Route connector actions",
+      "triggers": [
+        "connector",
+        "route"
+      ],
+      "requiredInputs": [
+        "manifest"
+      ]
+    }
+  ]
+}
