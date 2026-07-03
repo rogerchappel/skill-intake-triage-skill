@@ -27,3 +27,7 @@ This project is a release-candidate MVP. It expects JSON input and does not call
 ## Safety Notes
 
 The tool is read-only. Treat any external write, publish, approval, install, or connector execution as outside this package and subject to explicit user approval.
+
+## Release Candidate
+
+See `docs/RELEASE_CANDIDATE.md` and `docs/RELEASE_CHECKLIST.md` for the current readiness notes.
