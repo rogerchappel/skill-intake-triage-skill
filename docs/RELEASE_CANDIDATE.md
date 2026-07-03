@@ -6,7 +6,7 @@ incubate
 
 ## Verification
 
-Pending local run in factory lane.
+npm test: pass (4 tests); npm run check: pass; npm run build: pass; npm run smoke: pass, flags publish request for approval.
 
 ## Known Gaps
 
