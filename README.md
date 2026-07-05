@@ -41,3 +41,11 @@ npm run smoke
 npm run package:smoke
 npm run release:check
 ```
+
+## Verification
+
+```sh
+npm test
+npm run check --if-present
+npm run smoke --if-present
+```
