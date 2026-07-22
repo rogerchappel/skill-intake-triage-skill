@@ -5,8 +5,9 @@ export function triageSkillIntake(input) {
   const candidates = catalog.map((skill) => scoreSkill(request, skill)).filter((item) => item.score > 0).sort((a, b) => b.score - a.score);
   const best = candidates[0];
   const missingInputs = best ? requiredInputs(best.skill).filter((item) => !hasInput(request, item)) : [];
-  const action = blocked.length ? 'decline-or-ask-approval' : !best ? 'proceed-without-skill' : missingInputs.length ? 'ask-for-input' : 'use-skill';
-  return { action, selectedSkill: best?.skill.name ?? null, score: best?.score ?? 0, candidates: candidates.slice(0, 3).map(({skill, score, reasons}) => ({ name: skill.name, score, reasons })), missingInputs, safetyNotes: [...blocked, ...(best?.skill.sideEffects ? [best.skill.sideEffects] : [])] };
+  const declaredSideEffects = best?.skill.sideEffects ? [best.skill.sideEffects] : [];
+  const action = blocked.length ? 'decline-or-ask-approval' : !best ? 'proceed-without-skill' : missingInputs.length ? 'ask-for-input' : declaredSideEffects.length ? 'decline-or-ask-approval' : 'use-skill';
+  return { action, selectedSkill: best?.skill.name ?? null, score: best?.score ?? 0, candidates: candidates.slice(0, 3).map(({skill, score, reasons}) => ({ name: skill.name, score, reasons })), missingInputs, safetyNotes: [...blocked, ...declaredSideEffects] };
 }
 function normalizeText(value) { return String(value).toLowerCase(); }
 function detectUnsafe(text) {
