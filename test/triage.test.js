@@ -37,3 +37,23 @@ test('allows no-skill path for unrelated requests', () => {
   const result = triageSkillIntake({ request: 'summarize lunch options', catalog });
   assert.equal(result.action, 'proceed-without-skill');
 });
+test('does not match triggers embedded at the start or end of another word', () => {
+  for (const request of ['postpone lunch', 'review the compost']) {
+    const result = triageSkillIntake({
+      request,
+      catalog: [{ name: 'social-writer', triggers: ['post'], requiredInputs: [] }]
+    });
+    assert.equal(result.action, 'proceed-without-skill');
+    assert.equal(result.selectedSkill, null);
+    assert.equal(result.score, 0);
+  }
+});
+test('matches a trigger as a standalone word', () => {
+  const result = triageSkillIntake({
+    request: 'make a repo launch post',
+    catalog: [{ name: 'social-writer', triggers: ['post'], requiredInputs: [] }]
+  });
+  assert.equal(result.action, 'use-skill');
+  assert.equal(result.selectedSkill, 'social-writer');
+  assert.deepEqual(result.candidates[0].reasons, ['post']);
+});
