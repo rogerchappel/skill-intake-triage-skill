@@ -18,8 +18,12 @@ function detectUnsafe(text) {
 }
 function scoreSkill(request, skill) {
   const terms = [skill.name, ...(skill.triggers ?? []), ...(skill.description ? skill.description.split(/\W+/) : [])].map(normalizeText).filter(Boolean);
-  const matched = [...new Set(terms.filter((term) => term.length > 2 && request.includes(term)))];
+  const matched = [...new Set(terms.filter((term) => term.length > 2 && matchesTerm(request, term)))];
   return { skill, score: matched.length, reasons: matched.slice(0, 5) };
+}
+function matchesTerm(request, term) {
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}(?=$|[^\\p{L}\\p{N}])`, 'u').test(request);
 }
 function requiredInputs(skill) { return Array.isArray(skill.requiredInputs) ? skill.requiredInputs : []; }
 function hasInput(request, item) { return request.includes(String(item).toLowerCase()); }
