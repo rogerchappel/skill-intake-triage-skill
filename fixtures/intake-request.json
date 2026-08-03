@@ -12,8 +12,7 @@
       ],
       "requiredInputs": [
         "README.md"
-      ],
-      "sideEffects": "Drafting only; publishing requires approval."
+      ]
     },
     {
       "name": "connector-router",

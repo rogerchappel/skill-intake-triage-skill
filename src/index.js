@@ -12,9 +12,17 @@ export function triageSkillIntake(input) {
 function normalizeText(value) { return String(value).toLowerCase(); }
 function detectUnsafe(text) {
   const notes = [];
-  if (/\b(apply|approve|install|publish|send|delete|charge|merge)\b/.test(text)) notes.push('Request mentions an external or durable action; require explicit approval before side effects.');
+  if (hasAffirmativeDurableAction(text)) notes.push('Request mentions an external or durable action; require explicit approval before side effects.');
   if (/\b(secret|token|password|credential)\b/.test(text)) notes.push('Request may contain sensitive data; redact before sharing or logging.');
   return notes;
+}
+function hasAffirmativeDurableAction(text) {
+  const action = '(?:apply|approve|install|publish|send|delete|charge|merge)';
+  const inflectedAction = `${action}(?:d|s|ing)?`;
+  const negatedAction = new RegExp(`\\b(?:do\\s+not|don't|never|without)\\s+(?:[\\p{L}\\p{N}_-]+\\s+){0,2}${inflectedAction}\\b`, 'gu');
+  const withoutGerund = new RegExp(`\\bwithout\\s+(?:[\\p{L}\\p{N}_-]+\\s+){0,2}${action}(?:ing)\\b`, 'gu');
+  const affirmativeAction = new RegExp(`\\b${action}\\b`, 'u');
+  return affirmativeAction.test(text.replace(negatedAction, '').replace(withoutGerund, ''));
 }
 function scoreSkill(request, skill) {
   const terms = [skill.name, ...(skill.triggers ?? []), ...(skill.description ? skill.description.split(/\W+/) : [])].map(normalizeText).filter(Boolean);
