@@ -16,6 +16,25 @@ test('flags side-effect language', () => {
   const result = triageSkillIntake({ request: 'publish the launch post from README.md', catalog });
   assert.equal(result.action, 'decline-or-ask-approval');
 });
+test('does not flag an explicitly negated external action', () => {
+  for (const request of [
+    'draft the launch post from README.md, but do not publish it',
+    "draft the launch post from README.md; don't send it",
+    'prepare the launch post from README.md without publishing it',
+    'prepare the launch post from README.md and never publish it'
+  ]) {
+    const result = triageSkillIntake({ request, catalog });
+    assert.equal(result.action, 'use-skill');
+    assert.deepEqual(result.safetyNotes, []);
+  }
+});
+test('still flags an affirmative action alongside a negated action', () => {
+  const result = triageSkillIntake({
+    request: 'do not publish the launch post; send it from README.md',
+    catalog
+  });
+  assert.equal(result.action, 'decline-or-ask-approval');
+});
 test('gates a matching skill that declares side effects', () => {
   const result = triageSkillIntake({
     request: 'prepare release notes',
