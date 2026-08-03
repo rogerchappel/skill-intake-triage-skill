@@ -28,6 +28,8 @@ This project is a release-candidate MVP. It expects JSON input and does not call
 
 The tool is read-only. Treat any external write, publish, approval, install, or connector execution as outside this package and subject to explicit user approval.
 
+Action gating is conservative: affirmative requests to perform an external or durable action are gated, as are matching skills that declare side effects. An explicit prohibition such as `do not publish`, `never send`, or `without publishing` is treated as a local-only constraint, not as a request to perform that action. If the same request contains any other affirmative durable action, it remains gated.
+
 ## Release Candidate
 
 See `docs/RELEASE_CANDIDATE.md` and `docs/RELEASE_CHECKLIST.md` for the current readiness notes.
