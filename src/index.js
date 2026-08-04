@@ -17,12 +17,10 @@ function detectUnsafe(text) {
   return notes;
 }
 function hasAffirmativeDurableAction(text) {
-  const action = '(?:apply|approve|install|publish|send|delete|charge|merge)';
-  const inflectedAction = `${action}(?:d|s|ing)?`;
-  const negatedAction = new RegExp(`\\b(?:do\\s+not|don't|never|without)\\s+(?:[\\p{L}\\p{N}_-]+\\s+){0,2}${inflectedAction}\\b`, 'gu');
-  const withoutGerund = new RegExp(`\\bwithout\\s+(?:[\\p{L}\\p{N}_-]+\\s+){0,2}${action}(?:ing)\\b`, 'gu');
+  const action = '(?:apply|applies|applied|applying|approve|approves|approved|approving|install|installs|installed|installing|publish|publishes|published|publishing|send|sends|sent|sending|delete|deletes|deleted|deleting|charge|charges|charged|charging|merge|merges|merged|merging)';
+  const negatedAction = new RegExp(`\\b(?:do\\s+not|don't|never|without)\\s+(?:[\\p{L}\\p{N}_-]+\\s+){0,2}${action}\\b`, 'gu');
   const affirmativeAction = new RegExp(`\\b${action}\\b`, 'u');
-  return affirmativeAction.test(text.replace(negatedAction, '').replace(withoutGerund, ''));
+  return affirmativeAction.test(text.replace(negatedAction, ''));
 }
 function scoreSkill(request, skill) {
   const terms = [skill.name, ...(skill.triggers ?? []), ...(skill.description ? skill.description.split(/\W+/) : [])].map(normalizeText).filter(Boolean);
