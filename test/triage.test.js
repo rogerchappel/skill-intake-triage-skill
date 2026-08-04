@@ -16,6 +16,42 @@ test('flags side-effect language', () => {
   const result = triageSkillIntake({ request: 'publish the launch post from README.md', catalog });
   assert.equal(result.action, 'decline-or-ask-approval');
 });
+test('flags affirmative inflections of every durable action', () => {
+  const affirmativeForms = {
+    apply: ['apply', 'applies', 'applied', 'applying'],
+    approve: ['approve', 'approves', 'approved', 'approving'],
+    install: ['install', 'installs', 'installed', 'installing'],
+    publish: ['publish', 'publishes', 'published', 'publishing'],
+    send: ['send', 'sends', 'sent', 'sending'],
+    delete: ['delete', 'deletes', 'deleted', 'deleting'],
+    charge: ['charge', 'charges', 'charged', 'charging'],
+    merge: ['merge', 'merges', 'merged', 'merging']
+  };
+
+  for (const [action, forms] of Object.entries(affirmativeForms)) {
+    for (const form of forms) {
+      const result = triageSkillIntake({ request: `the automation is ${form} the release`, catalog: [] });
+      assert.equal(result.action, 'decline-or-ask-approval', `${action}: ${form}`);
+      assert.deepEqual(result.safetyNotes, [
+        'Request mentions an external or durable action; require explicit approval before side effects.'
+      ], `${action}: ${form}`);
+    }
+  }
+});
+test('allows explicitly negated inflections of every durable action', () => {
+  for (const form of ['applying', 'approved', 'installs', 'published', 'sending', 'deleted', 'charges', 'merges']) {
+    const result = triageSkillIntake({ request: `prepare the release without ${form} it`, catalog: [] });
+    assert.equal(result.action, 'proceed-without-skill', form);
+    assert.deepEqual(result.safetyNotes, [], form);
+  }
+});
+test('does not treat durable action text inside a larger word as an action', () => {
+  for (const request of ['the applicant is ready', 'approval is pending', 'the sender replied', 'mergeable result']) {
+    const result = triageSkillIntake({ request, catalog: [] });
+    assert.equal(result.action, 'proceed-without-skill', request);
+    assert.deepEqual(result.safetyNotes, [], request);
+  }
+});
 test('does not flag an explicitly negated external action', () => {
   for (const request of [
     'draft the launch post from README.md, but do not publish it',
@@ -34,6 +70,14 @@ test('still flags an affirmative action alongside a negated action', () => {
     catalog
   });
   assert.equal(result.action, 'decline-or-ask-approval');
+});
+test('still flags an affirmative inflection alongside a negated inflection', () => {
+  const result = triageSkillIntake({
+    request: 'do not publish the draft; the automation is sending it',
+    catalog: []
+  });
+  assert.equal(result.action, 'decline-or-ask-approval');
+  assert.equal(result.safetyNotes.length, 1);
 });
 test('gates a matching skill that declares side effects', () => {
   const result = triageSkillIntake({
