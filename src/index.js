@@ -5,7 +5,7 @@ export function triageSkillIntake(input) {
   const candidates = catalog.map((skill) => scoreSkill(request, skill)).filter((item) => item.score > 0).sort((a, b) => b.score - a.score);
   const best = candidates[0];
   const missingInputs = best ? requiredInputs(best.skill).filter((item) => !hasInput(request, item)) : [];
-  const declaredSideEffects = best?.skill.sideEffects ? [best.skill.sideEffects] : [];
+  const declaredSideEffects = normalizeSideEffects(best?.skill.sideEffects);
   const action = blocked.length ? 'decline-or-ask-approval' : !best ? 'proceed-without-skill' : missingInputs.length ? 'ask-for-input' : declaredSideEffects.length ? 'decline-or-ask-approval' : 'use-skill';
   return { action, selectedSkill: best?.skill.name ?? null, score: best?.score ?? 0, candidates: candidates.slice(0, 3).map(({skill, score, reasons}) => ({ name: skill.name, score, reasons })), missingInputs, safetyNotes: [...blocked, ...declaredSideEffects] };
 }
@@ -32,6 +32,10 @@ function matchesTerm(request, term) {
   return new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}(?=$|[^\\p{L}\\p{N}])`, 'u').test(request);
 }
 function requiredInputs(skill) { return Array.isArray(skill.requiredInputs) ? skill.requiredInputs : []; }
+function normalizeSideEffects(sideEffects) {
+  const declarations = Array.isArray(sideEffects) ? sideEffects : [sideEffects];
+  return declarations.filter((item) => typeof item === 'string').map((item) => item.trim()).filter(Boolean);
+}
 function hasInput(request, item) { return request.includes(String(item).toLowerCase()); }
 export function formatTriageReport(result) {
   const lines = ['# Skill Intake Triage', `Action: ${result.action}`, `Selected skill: ${result.selectedSkill ?? 'none'}`, `Missing inputs: ${result.missingInputs.length ? result.missingInputs.join(', ') : 'none'}`, 'Safety notes:', ...(result.safetyNotes.length ? result.safetyNotes.map((note) => `- ${note}`) : ['- none'])];
