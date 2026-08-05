@@ -20,6 +20,8 @@ node bin/skill-intake-triage-skill.js --fixture fixtures/intake-request.json
 
 Import from `src/index.js` or package exports once installed. The API is local-first and deterministic for fixture-driven review.
 
+Catalog entries may declare `sideEffects` as either one non-empty string or an array of non-empty strings. Each string becomes a separate safety note and gates use of the selected skill pending approval. Omit `sideEffects`, or use `""` or `[]`, for skills with no declared side effects. See `fixtures/intake-request.json` for an executable catalog example.
+
 ## Limitations
 
 This project is a release-candidate MVP. It expects JSON input and does not call external services.
