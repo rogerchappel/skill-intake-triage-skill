@@ -12,7 +12,8 @@
       ],
       "requiredInputs": [
         "README.md"
-      ]
+      ],
+      "sideEffects": []
     },
     {
       "name": "connector-router",
