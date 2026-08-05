@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { triageSkillIntake } from '../src/index.js';
+import { formatTriageReport, triageSkillIntake } from '../src/index.js';
 const catalog = [{ name: 'repo-to-content-skill', triggers: ['repo','launch','post'], requiredInputs: ['README.md'] }];
 test('selects a matching skill when inputs are present', () => {
   const result = triageSkillIntake({ request: 'make a repo launch post from README.md', catalog });
@@ -87,6 +87,31 @@ test('gates a matching skill that declares side effects', () => {
   assert.equal(result.action, 'decline-or-ask-approval');
   assert.equal(result.selectedSkill, 'publisher');
   assert.deepEqual(result.safetyNotes, ['Publishing requires approval']);
+});
+test('ignores empty side-effect declarations', () => {
+  for (const sideEffects of ['', []]) {
+    const result = triageSkillIntake({
+      request: 'prepare release notes',
+      catalog: [{ name: 'release-notes', triggers: ['release'], requiredInputs: [], sideEffects }]
+    });
+    assert.equal(result.action, 'use-skill');
+    assert.deepEqual(result.safetyNotes, []);
+    assert.match(formatTriageReport(result), /Safety notes:\n- none$/);
+  }
+});
+test('emits one safety note for each declared side effect', () => {
+  const result = triageSkillIntake({
+    request: 'prepare release notes',
+    catalog: [{
+      name: 'publisher',
+      triggers: ['release'],
+      requiredInputs: [],
+      sideEffects: ['Publish the release', 'Notify subscribers']
+    }]
+  });
+  assert.equal(result.action, 'decline-or-ask-approval');
+  assert.deepEqual(result.safetyNotes, ['Publish the release', 'Notify subscribers']);
+  assert.match(formatTriageReport(result), /Safety notes:\n- Publish the release\n- Notify subscribers$/);
 });
 test('uses a matching skill without declared side effects', () => {
   const result = triageSkillIntake({
