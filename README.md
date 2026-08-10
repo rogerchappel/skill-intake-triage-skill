@@ -46,6 +46,9 @@ npm run package:smoke
 npm run release:check
 ```
 
+`npm run package:smoke` inspects the `npm pack` manifest and fails when a
+required published artifact, including `SKILL.md`, is missing.
+
 ## Verification
 
 ```sh
