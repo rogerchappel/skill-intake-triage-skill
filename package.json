@@ -15,8 +15,8 @@
     "build": "node scripts/build.js",
     "smoke": "node bin/skill-intake-triage-skill.js --fixture fixtures/intake-request.json",
     "lint": "npm run check",
-    "package:smoke": "npm pack --dry-run",
-    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke"
+    "package:smoke": "node scripts/verify-package.js",
+    "release:check": "npm run check && npm test && npm run build && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "agent-skill",
@@ -39,6 +39,7 @@
     "src",
     "fixtures",
     "scripts",
+    "SKILL.md",
     "README.md",
     "LICENSE",
     "SECURITY.md"
