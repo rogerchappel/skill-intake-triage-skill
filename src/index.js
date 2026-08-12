@@ -36,7 +36,7 @@ function normalizeSideEffects(sideEffects) {
   const declarations = Array.isArray(sideEffects) ? sideEffects : [sideEffects];
   return declarations.filter((item) => typeof item === 'string').map((item) => item.trim()).filter(Boolean);
 }
-function hasInput(request, item) { return request.includes(String(item).toLowerCase()); }
+function hasInput(request, item) { return matchesTerm(request, normalizeText(item)); }
 export function formatTriageReport(result) {
   const lines = ['# Skill Intake Triage', `Action: ${result.action}`, `Selected skill: ${result.selectedSkill ?? 'none'}`, `Missing inputs: ${result.missingInputs.length ? result.missingInputs.join(', ') : 'none'}`, 'Safety notes:', ...(result.safetyNotes.length ? result.safetyNotes.map((note) => `- ${note}`) : ['- none'])];
   return lines.join('\n');
