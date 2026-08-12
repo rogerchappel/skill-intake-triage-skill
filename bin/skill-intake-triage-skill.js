@@ -1,7 +1,22 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
 import { triageSkillIntake, formatTriageReport } from '../src/index.js';
-const idx = process.argv.indexOf('--fixture');
-if (idx === -1 || !process.argv[idx + 1]) { console.error('Usage: skill-intake-triage-skill --fixture <file>'); process.exit(2); }
-const input = JSON.parse(readFileSync(process.argv[idx + 1], 'utf8'));
-console.log(formatTriageReport(triageSkillIntake(input)));
+
+const usage = 'Usage: skill-intake-triage-skill --fixture <file>';
+const args = process.argv.slice(2);
+
+if (args.length !== 2 || args[0] !== '--fixture' || !args[1] || args[1].startsWith('--')) {
+  console.error(usage);
+  process.exitCode = 2;
+} else {
+  try {
+    const input = JSON.parse(readFileSync(args[1], 'utf8'));
+    console.log(formatTriageReport(triageSkillIntake(input)));
+  } catch (error) {
+    const detail = error instanceof SyntaxError
+      ? 'fixture is not valid JSON'
+      : `cannot read fixture: ${error.message}`;
+    console.error(`Error: ${detail}`);
+    process.exitCode = 1;
+  }
+}

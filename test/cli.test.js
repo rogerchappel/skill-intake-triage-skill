@@ -1,0 +1,55 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtemp, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+
+const cli = new URL('../bin/skill-intake-triage-skill.js', import.meta.url);
+const usage = 'Usage: skill-intake-triage-skill --fixture <file>\n';
+
+function run(args) {
+  return spawnSync(process.execPath, [cli.pathname, ...args], { encoding: 'utf8' });
+}
+
+test('preserves the documented CLI invocation', () => {
+  const fixture = new URL('../fixtures/intake-request.json', import.meta.url);
+  const result = run(['--fixture', fixture.pathname]);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /^# Skill Intake Triage\n/);
+  assert.equal(result.stderr, '');
+});
+
+test('rejects missing, unknown, duplicate, and unexpected arguments', () => {
+  for (const args of [
+    [],
+    ['--unknown'],
+    ['--fixture'],
+    ['--fixture', '--unknown'],
+    ['--fixture', 'one.json', '--fixture', 'two.json'],
+    ['--fixture', 'one.json', 'extra']
+  ]) {
+    const result = run(args);
+    assert.equal(result.status, 2, args.join(' '));
+    assert.equal(result.stdout, '', args.join(' '));
+    assert.equal(result.stderr, usage, args.join(' '));
+  }
+});
+
+test('reports unreadable and malformed fixtures without a stack trace', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-intake-cli-'));
+  const malformed = join(directory, 'malformed.json');
+  await writeFile(malformed, '{invalid');
+
+  const cases = [
+    [join(directory, 'missing.json'), /^Error: cannot read fixture: /],
+    [malformed, /^Error: fixture is not valid JSON\n$/]
+  ];
+  for (const [fixture, message] of cases) {
+    const result = run(['--fixture', fixture]);
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, '');
+    assert.match(result.stderr, message);
+    assert.doesNotMatch(result.stderr, /\n\s+at\s/);
+  }
+});

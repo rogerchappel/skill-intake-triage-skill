@@ -12,6 +12,18 @@ test('asks for missing required inputs', () => {
   assert.equal(result.action, 'ask-for-input');
   assert.deepEqual(result.missingInputs, ['README.md']);
 });
+test('does not satisfy a required input with a larger filename', () => {
+  const result = triageSkillIntake({ request: 'make a repo launch post from NOTREADME.md', catalog });
+  assert.equal(result.action, 'ask-for-input');
+  assert.deepEqual(result.missingInputs, ['README.md']);
+});
+test('recognizes documented required inputs next to punctuation', () => {
+  for (const request of ['use README.md, please', 'use (README.md)']) {
+    const result = triageSkillIntake({ request: `make a repo launch post; ${request}`, catalog });
+    assert.equal(result.action, 'use-skill', request);
+    assert.deepEqual(result.missingInputs, [], request);
+  }
+});
 test('flags side-effect language', () => {
   const result = triageSkillIntake({ request: 'publish the launch post from README.md', catalog });
   assert.equal(result.action, 'decline-or-ask-approval');
