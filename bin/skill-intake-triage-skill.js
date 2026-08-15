@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
-import { triageSkillIntake, formatTriageReport } from '../src/index.js';
+import { InvalidFixtureError, triageSkillIntake, formatTriageReport } from '../src/index.js';
 
 const usage = 'Usage: skill-intake-triage-skill --fixture <file>';
 const args = process.argv.slice(2);
@@ -15,7 +15,9 @@ if (args.length !== 2 || args[0] !== '--fixture' || !args[1] || args[1].startsWi
   } catch (error) {
     const detail = error instanceof SyntaxError
       ? 'fixture is not valid JSON'
-      : `cannot read fixture: ${error.message}`;
+      : error instanceof InvalidFixtureError
+        ? error.message
+        : `cannot read fixture: ${error.message}`;
     console.error(`Error: ${detail}`);
     process.exitCode = 1;
   }
