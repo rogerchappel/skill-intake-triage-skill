@@ -1,6 +1,14 @@
+export class InvalidFixtureError extends TypeError {
+  constructor(message) {
+    super(`invalid fixture: ${message}`);
+    this.name = 'InvalidFixtureError';
+  }
+}
+
 export function triageSkillIntake(input) {
+  validateFixture(input);
   const request = normalizeText(input.request ?? '');
-  const catalog = Array.isArray(input.catalog) ? input.catalog : [];
+  const catalog = input.catalog;
   const blocked = detectUnsafe(request);
   const candidates = catalog.map((skill) => scoreSkill(request, skill)).filter((item) => item.score > 0).sort((a, b) => b.score - a.score);
   const best = candidates[0];
@@ -8,6 +16,31 @@ export function triageSkillIntake(input) {
   const declaredSideEffects = normalizeSideEffects(best?.skill.sideEffects);
   const action = blocked.length ? 'decline-or-ask-approval' : !best ? 'proceed-without-skill' : missingInputs.length ? 'ask-for-input' : declaredSideEffects.length ? 'decline-or-ask-approval' : 'use-skill';
   return { action, selectedSkill: best?.skill.name ?? null, score: best?.score ?? 0, candidates: candidates.slice(0, 3).map(({skill, score, reasons}) => ({ name: skill.name, score, reasons })), missingInputs, safetyNotes: [...blocked, ...declaredSideEffects] };
+}
+function validateFixture(input) {
+  if (!isObject(input)) throw new InvalidFixtureError('expected an object');
+  if (typeof input.request !== 'string') throw new InvalidFixtureError('request must be a string');
+  if (!Array.isArray(input.catalog)) throw new InvalidFixtureError('catalog must be an array');
+
+  input.catalog.forEach((skill, index) => {
+    const path = `catalog[${index}]`;
+    if (!isObject(skill)) throw new InvalidFixtureError(`${path} must be an object`);
+    if (typeof skill.name !== 'string' || !skill.name.trim()) throw new InvalidFixtureError(`${path}.name must be a non-empty string`);
+    validateOptionalString(skill, 'description', path);
+    validateOptionalStringArray(skill, 'triggers', path);
+    validateOptionalStringArray(skill, 'requiredInputs', path);
+    if (skill.sideEffects !== undefined && typeof skill.sideEffects !== 'string' && !isStringArray(skill.sideEffects)) {
+      throw new InvalidFixtureError(`${path}.sideEffects must be a string or an array of strings`);
+    }
+  });
+}
+function isObject(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
+function isStringArray(value) { return Array.isArray(value) && value.every((item) => typeof item === 'string'); }
+function validateOptionalString(object, field, path) {
+  if (object[field] !== undefined && typeof object[field] !== 'string') throw new InvalidFixtureError(`${path}.${field} must be a string`);
+}
+function validateOptionalStringArray(object, field, path) {
+  if (object[field] !== undefined && !isStringArray(object[field])) throw new InvalidFixtureError(`${path}.${field} must be an array of strings`);
 }
 function normalizeText(value) { return String(value).toLowerCase(); }
 function detectUnsafe(text) {

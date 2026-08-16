@@ -53,3 +53,21 @@ test('reports unreadable and malformed fixtures without a stack trace', async ()
     assert.doesNotMatch(result.stderr, /\n\s+at\s/);
   }
 });
+
+test('reports invalid fixture shapes separately from read failures', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-intake-cli-'));
+  const cases = [
+    ['null.json', null, 'Error: invalid fixture: expected an object\n'],
+    ['null-entry.json', { request: 'make a post', catalog: [null] }, 'Error: invalid fixture: catalog[0] must be an object\n'],
+    ['triggers.json', { request: 'make a post', catalog: [{ name: 'writer', triggers: 42 }] }, 'Error: invalid fixture: catalog[0].triggers must be an array of strings\n']
+  ];
+  for (const [name, fixture, message] of cases) {
+    const path = join(directory, name);
+    await writeFile(path, JSON.stringify(fixture));
+    const result = run(['--fixture', path]);
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, '');
+    assert.equal(result.stderr, message);
+    assert.doesNotMatch(result.stderr, /TypeError|Cannot read|is not iterable|\n\s+at\s/);
+  }
+});

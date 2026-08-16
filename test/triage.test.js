@@ -1,7 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatTriageReport, triageSkillIntake } from '../src/index.js';
+import { InvalidFixtureError, formatTriageReport, triageSkillIntake } from '../src/index.js';
 const catalog = [{ name: 'repo-to-content-skill', triggers: ['repo','launch','post'], requiredInputs: ['README.md'] }];
+test('rejects invalid fixture shapes with deterministic diagnostics', () => {
+  const cases = [
+    [null, 'invalid fixture: expected an object'],
+    [{ request: 42, catalog: [] }, 'invalid fixture: request must be a string'],
+    [{ request: 'make a post', catalog: null }, 'invalid fixture: catalog must be an array'],
+    [{ request: 'make a post', catalog: [null] }, 'invalid fixture: catalog[0] must be an object'],
+    [{ request: 'make a post', catalog: [{}] }, 'invalid fixture: catalog[0].name must be a non-empty string'],
+    [{ request: 'make a post', catalog: [{ name: 'writer', triggers: 42 }] }, 'invalid fixture: catalog[0].triggers must be an array of strings']
+  ];
+  for (const [fixture, message] of cases) {
+    assert.throws(() => triageSkillIntake(fixture), (error) => {
+      assert.ok(error instanceof InvalidFixtureError);
+      assert.equal(error.message, message);
+      return true;
+    });
+  }
+});
+test('preserves valid fixtures with omitted optional catalog fields', () => {
+  const result = triageSkillIntake({ request: 'use writer', catalog: [{ name: 'writer' }] });
+  assert.equal(result.action, 'use-skill');
+  assert.equal(result.selectedSkill, 'writer');
+});
 test('selects a matching skill when inputs are present', () => {
   const result = triageSkillIntake({ request: 'make a repo launch post from README.md', catalog });
   assert.equal(result.action, 'use-skill');
