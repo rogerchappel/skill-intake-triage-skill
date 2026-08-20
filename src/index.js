@@ -51,7 +51,7 @@ function detectUnsafe(text) {
 }
 function hasAffirmativeDurableAction(text) {
   const action = '(?:apply|applies|applied|applying|approve|approves|approved|approving|install|installs|installed|installing|publish|publishes|published|publishing|send|sends|sent|sending|delete|deletes|deleted|deleting|charge|charges|charged|charging|merge|merges|merged|merging)';
-  const negatedAction = new RegExp(`\\b(?:do\\s+not|don't|never|without)\\s+(?:[\\p{L}\\p{N}_-]+\\s+){0,2}${action}\\b`, 'gu');
+  const negatedAction = new RegExp(`\\b(?:do\\s+not|don't|never|without)\\s+(?:[\\p{L}\\p{N}_-]+\\s+){0,8}${action}\\b`, 'gu');
   const affirmativeAction = new RegExp(`\\b${action}\\b`, 'u');
   return affirmativeAction.test(text.replace(negatedAction, ''));
 }
