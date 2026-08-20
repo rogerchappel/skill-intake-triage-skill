@@ -20,6 +20,19 @@ test('preserves the documented CLI invocation', () => {
   assert.equal(result.stderr, '');
 });
 
+test('reports long-form prohibitions as local-only constraints', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-intake-cli-'));
+  const fixture = join(directory, 'prohibition.json');
+  await writeFile(fixture, JSON.stringify({
+    request: 'do not under any circumstances publish the report',
+    catalog: []
+  }));
+  const result = run(['--fixture', fixture]);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Action: proceed-without-skill/);
+  assert.match(result.stdout, /Safety notes:\n- none/);
+});
+
 test('rejects missing, unknown, duplicate, and unexpected arguments', () => {
   for (const args of [
     [],

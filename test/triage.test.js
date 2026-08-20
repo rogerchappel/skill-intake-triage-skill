@@ -98,6 +98,25 @@ test('does not flag an explicitly negated external action', () => {
     assert.deepEqual(result.safetyNotes, []);
   }
 });
+test('allows explicit prohibitions with intervening modifier phrases', () => {
+  for (const request of [
+    'do not under any circumstances publish the report',
+    'never automatically send the draft to subscribers',
+    'prepare the report without first publicly publishing it'
+  ]) {
+    const result = triageSkillIntake({ request, catalog: [] });
+    assert.equal(result.action, 'proceed-without-skill', request);
+    assert.deepEqual(result.safetyNotes, [], request);
+  }
+});
+test('still gates a separate affirmative action after a long prohibition', () => {
+  const result = triageSkillIntake({
+    request: 'do not under any circumstances publish the report; send it to the editor',
+    catalog: []
+  });
+  assert.equal(result.action, 'decline-or-ask-approval');
+  assert.equal(result.safetyNotes.length, 1);
+});
 test('still flags an affirmative action alongside a negated action', () => {
   const result = triageSkillIntake({
     request: 'do not publish the launch post; send it from README.md',
