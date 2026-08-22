@@ -56,9 +56,16 @@ function hasAffirmativeDurableAction(text) {
   return affirmativeAction.test(text.replace(negatedAction, ''));
 }
 function scoreSkill(request, skill) {
-  const terms = [skill.name, ...(skill.triggers ?? []), ...(skill.description ? skill.description.split(/\W+/) : [])].map(normalizeText).filter(Boolean);
+  const terms = [skill.name, ...(skill.triggers ?? []), ...descriptionPhrases(skill.description)].map(normalizeText).filter(Boolean);
   const matched = [...new Set(terms.filter((term) => term.length > 2 && matchesTerm(request, term)))];
   return { skill, score: matched.length, reasons: matched.slice(0, 5) };
+}
+function descriptionPhrases(description) {
+  if (!description) return [];
+  const stopWords = new Set(['a', 'an', 'and', 'as', 'at', 'be', 'by', 'for', 'from', 'in', 'is', 'it', 'of', 'on', 'or', 'the', 'to', 'with']);
+  const words = normalizeText(description).match(/[\p{L}\p{N}_-]+/gu) ?? [];
+  const meaningful = words.filter((word) => word.length > 2 && !stopWords.has(word));
+  return meaningful.slice(0, -1).map((word, index) => `${word} ${meaningful[index + 1]}`);
 }
 function matchesTerm(request, term) {
   const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
