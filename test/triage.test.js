@@ -178,6 +178,34 @@ test('allows no-skill path for unrelated requests', () => {
   const result = triageSkillIntake({ request: 'summarize lunch options', catalog });
   assert.equal(result.action, 'proceed-without-skill');
 });
+test('does not select a skill from generic description words', () => {
+  const cases = [
+    {
+      request: 'summarize the quarterly report',
+      skill: { name: 'image-generator', description: 'Create the best image assets' }
+    },
+    {
+      request: 'review project status',
+      skill: { name: 'emailer', description: 'Send project updates' }
+    }
+  ];
+
+  for (const { request, skill } of cases) {
+    const result = triageSkillIntake({ request, catalog: [skill] });
+    assert.equal(result.action, 'proceed-without-skill', request);
+    assert.equal(result.selectedSkill, null, request);
+    assert.equal(result.score, 0, request);
+  }
+});
+test('matches a distinctive phrase derived from a description', () => {
+  const result = triageSkillIntake({
+    request: 'generate polished image assets for the campaign',
+    catalog: [{ name: 'visual-maker', description: 'Create the best image assets' }]
+  });
+  assert.equal(result.action, 'use-skill');
+  assert.equal(result.selectedSkill, 'visual-maker');
+  assert.deepEqual(result.candidates[0].reasons, ['image assets']);
+});
 test('does not match triggers embedded at the start or end of another word', () => {
   for (const request of ['postpone lunch', 'review the compost']) {
     const result = triageSkillIntake({

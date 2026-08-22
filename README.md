@@ -41,6 +41,15 @@ Required inputs use boundary-aware, case-insensitive matching: `README.md` is
 recognized as an exact input next to ordinary punctuation, while
 `NOTREADME.md` does not satisfy it.
 
+### Skill matching
+
+Skill selection is boundary-aware and case-insensitive. An exact skill name or
+any declared trigger can select a catalog entry. Descriptions provide fallback
+matching only through two-word phrases formed from their meaningful words;
+individual description words do not count. For example, `image assets` can
+match a description containing that phrase, while shared prose such as `the`
+or an incidental noun such as `project` cannot select a skill by itself.
+
 ## Limitations
 
 This project is a release-candidate MVP. It expects JSON input and does not call external services.
