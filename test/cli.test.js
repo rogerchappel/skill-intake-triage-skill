@@ -33,6 +33,19 @@ test('reports long-form prohibitions as local-only constraints', async () => {
   assert.match(result.stdout, /Safety notes:\n- none/);
 });
 
+test('gates an affirmative CLI action after a prohibited clause', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-intake-cli-'));
+  const fixture = join(directory, 'mixed-actions.json');
+  await writeFile(fixture, JSON.stringify({
+    request: 'do not publish, however send the report',
+    catalog: []
+  }));
+  const result = run(['--fixture', fixture]);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Action: decline-or-ask-approval/);
+  assert.match(result.stdout, /Request mentions an external or durable action/);
+});
+
 test('rejects missing, unknown, duplicate, and unexpected arguments', () => {
   for (const args of [
     [],

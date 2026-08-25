@@ -132,6 +132,35 @@ test('still flags an affirmative inflection alongside a negated inflection', () 
   assert.equal(result.action, 'decline-or-ask-approval');
   assert.equal(result.safetyNotes.length, 1);
 });
+test('scopes prohibitions before independent affirmative clauses', () => {
+  const cases = [
+    'do not publish but send the report',
+    'do not publish, however send the report',
+    'do not publish; then send the report',
+    'do not publish. Send the report',
+    'do not publish and merge the approved change',
+    'never automatically sending the draft, but publishes the report'
+  ];
+  for (const request of cases) {
+    const result = triageSkillIntake({ request, catalog: [] });
+    assert.equal(result.action, 'decline-or-ask-approval', request);
+    assert.deepEqual(result.safetyNotes, [
+      'Request mentions an external or durable action; require explicit approval before side effects.'
+    ], request);
+  }
+});
+test('keeps genuinely shared prohibitions local-only', () => {
+  for (const request of [
+    'do not publish or send the report',
+    "don't delete or merge the change",
+    'never automatically publish or publicly send the report',
+    'prepare the report without publishing or sending it'
+  ]) {
+    const result = triageSkillIntake({ request, catalog: [] });
+    assert.equal(result.action, 'proceed-without-skill', request);
+    assert.deepEqual(result.safetyNotes, [], request);
+  }
+});
 test('gates a matching skill that declares side effects', () => {
   const result = triageSkillIntake({
     request: 'prepare release notes',
