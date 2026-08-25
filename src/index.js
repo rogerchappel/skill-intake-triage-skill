@@ -51,9 +51,19 @@ function detectUnsafe(text) {
 }
 function hasAffirmativeDurableAction(text) {
   const action = '(?:apply|applies|applied|applying|approve|approves|approved|approving|install|installs|installed|installing|publish|publishes|published|publishing|send|sends|sent|sending|delete|deletes|deleted|deleting|charge|charges|charged|charging|merge|merges|merged|merging)';
-  const negatedAction = new RegExp(`\\b(?:do\\s+not|don't|never|without)\\s+(?:[\\p{L}\\p{N}_-]+\\s+){0,8}${action}\\b`, 'gu');
-  const affirmativeAction = new RegExp(`\\b${action}\\b`, 'u');
-  return affirmativeAction.test(text.replace(negatedAction, ''));
+  const actions = text.matchAll(new RegExp(`\\b${action}\\b`, 'gu'));
+  return [...actions].some((match) => !isNegatedAction(text, match.index));
+}
+function isNegatedAction(text, actionIndex) {
+  const beforeAction = text.slice(0, actionIndex);
+  const boundaries = [...beforeAction.matchAll(/(?:[.;:!?]|\b(?:and|but|however|then)\b)/gu)];
+  const clauseStart = boundaries.at(-1)?.index;
+  const clause = beforeAction.slice(clauseStart === undefined ? 0 : clauseStart + boundaries.at(-1)[0].length);
+  const negations = [...clause.matchAll(/\b(?:do\s+not|don't|never|without)\b/gu)];
+  const negation = negations.at(-1);
+  if (!negation) return false;
+  const intervening = clause.slice(negation.index + negation[0].length);
+  return (intervening.match(/[\p{L}\p{N}_-]+/gu) ?? []).length <= 8;
 }
 function scoreSkill(request, skill) {
   const terms = [skill.name, ...(skill.triggers ?? []), ...descriptionPhrases(skill.description)].map(normalizeText).filter(Boolean);
