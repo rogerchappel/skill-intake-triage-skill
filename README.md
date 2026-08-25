@@ -58,7 +58,7 @@ This project is a release-candidate MVP. It expects JSON input and does not call
 
 The tool is read-only. Treat any external write, publish, approval, install, or connector execution as outside this package and subject to explicit user approval.
 
-Action gating is conservative: affirmative requests to apply, approve, install, publish, send, delete, charge, or merge are gated, including grammatical forms such as `publishing`, `sent`, `deleted`, and `merges`. Matching skills that declare side effects are also gated. An explicit prohibition such as `do not publish`, `never automatically send`, or `without first publicly publishing` is treated as a local-only constraint, even when ordinary modifier words appear before the action. If the same request contains any other affirmative durable action, including an inflected form, it remains gated.
+Action gating is conservative: affirmative requests to apply, approve, install, publish, send, delete, charge, or merge are gated, including grammatical forms such as `publishing`, `sent`, `deleted`, and `merges`. Matching skills that declare side effects are also gated. An explicit prohibition such as `do not publish`, `never automatically send`, or `without first publicly publishing` is treated as a local-only constraint, even when ordinary modifier words appear before the action. A shared prohibition such as `do not publish or send` keeps both actions local-only. A separate affirmative clause after punctuation, `but`, `however`, `then`, or `and` remains gated, including inflected forms; for example, `do not publish, however send the report` requires approval.
 
 ## Release Candidate
 
