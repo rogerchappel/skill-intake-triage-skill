@@ -29,18 +29,24 @@ function validateFixture(input) {
     validateOptionalString(skill, 'description', path);
     validateOptionalStringArray(skill, 'triggers', path);
     validateOptionalStringArray(skill, 'requiredInputs', path);
-    if (skill.sideEffects !== undefined && typeof skill.sideEffects !== 'string' && !isStringArray(skill.sideEffects)) {
+    if (skill.sideEffects !== undefined && typeof skill.sideEffects !== 'string' && !Array.isArray(skill.sideEffects)) {
       throw new InvalidFixtureError(`${path}.sideEffects must be a string or an array of strings`);
     }
+    if (Array.isArray(skill.sideEffects)) validateNonEmptyStringArray(skill.sideEffects, 'sideEffects', path);
   });
 }
 function isObject(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
-function isStringArray(value) { return Array.isArray(value) && value.every((item) => typeof item === 'string'); }
 function validateOptionalString(object, field, path) {
   if (object[field] !== undefined && typeof object[field] !== 'string') throw new InvalidFixtureError(`${path}.${field} must be a string`);
 }
 function validateOptionalStringArray(object, field, path) {
-  if (object[field] !== undefined && !isStringArray(object[field])) throw new InvalidFixtureError(`${path}.${field} must be an array of strings`);
+  if (object[field] === undefined) return;
+  if (!Array.isArray(object[field])) throw new InvalidFixtureError(`${path}.${field} must be an array of strings`);
+  validateNonEmptyStringArray(object[field], field, path);
+}
+function validateNonEmptyStringArray(value, field, path) {
+  const invalidIndex = value.findIndex((item) => typeof item !== 'string' || !item.trim());
+  if (invalidIndex !== -1) throw new InvalidFixtureError(`${path}.${field}[${invalidIndex}] must be a non-empty string`);
 }
 function normalizeText(value) { return String(value).toLowerCase(); }
 function detectUnsafe(text) {
