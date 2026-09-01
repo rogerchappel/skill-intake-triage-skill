@@ -30,8 +30,10 @@ Import from `src/index.js` or package exports once installed. The API is local-f
 
 A fixture is a JSON object with a string `request` and an array `catalog`.
 Every catalog entry is an object with a non-empty string `name`. Optional fields
-are `description` (string), `triggers` and `requiredInputs` (arrays of strings),
-and `sideEffects` (a string or array of strings). Unknown fields are ignored.
+are `description` (string), `triggers` and `requiredInputs` (arrays of non-empty
+strings), and `sideEffects` (a string or an array of non-empty strings). The
+three array fields may be omitted or set to `[]`; blank or whitespace-only array
+entries are invalid. Unknown fields are ignored.
 The library throws `InvalidFixtureError` with the first invalid field path when
 this schema is not met; the CLI prints the same deterministic diagnostic.
 
