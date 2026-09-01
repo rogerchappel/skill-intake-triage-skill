@@ -97,3 +97,25 @@ test('reports invalid fixture shapes separately from read failures', async () =>
     assert.doesNotMatch(result.stderr, /TypeError|Cannot read|is not iterable|\n\s+at\s/);
   }
 });
+
+test('reports blank catalog array entries with deterministic field paths', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-intake-cli-'));
+  for (const field of ['triggers', 'requiredInputs', 'sideEffects']) {
+    const path = join(directory, `${field}.json`);
+    await writeFile(path, JSON.stringify({ request: 'use writer', catalog: [{ name: 'writer', [field]: ['   '] }] }));
+    const result = run(['--fixture', path]);
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, '');
+    assert.equal(result.stderr, `Error: invalid fixture: catalog[0].${field}[0] must be a non-empty string\n`);
+  }
+});
+
+test('accepts empty optional catalog arrays through the CLI', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-intake-cli-'));
+  const path = join(directory, 'empty-arrays.json');
+  await writeFile(path, JSON.stringify({ request: 'use writer', catalog: [{ name: 'writer', triggers: [], requiredInputs: [], sideEffects: [] }] }));
+  const result = run(['--fixture', path]);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Selected skill: writer/);
+  assert.equal(result.stderr, '');
+});

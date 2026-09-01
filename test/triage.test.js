@@ -19,6 +19,25 @@ test('rejects invalid fixture shapes with deterministic diagnostics', () => {
     });
   }
 });
+test('rejects blank catalog array entries with deterministic field paths', () => {
+  for (const field of ['triggers', 'requiredInputs', 'sideEffects']) {
+    for (const value of ['', '   ']) {
+      const fixture = { request: 'use writer', catalog: [{ name: 'writer', [field]: ['valid', value] }] };
+      assert.throws(() => triageSkillIntake(fixture), (error) => {
+        assert.ok(error instanceof InvalidFixtureError);
+        assert.equal(error.message, `invalid fixture: catalog[0].${field}[1] must be a non-empty string`);
+        return true;
+      });
+    }
+  }
+});
+test('accepts omitted and empty optional catalog arrays', () => {
+  for (const fields of [{}, { triggers: [], requiredInputs: [], sideEffects: [] }]) {
+    const result = triageSkillIntake({ request: 'use writer', catalog: [{ name: 'writer', ...fields }] });
+    assert.equal(result.action, 'use-skill');
+    assert.equal(result.selectedSkill, 'writer');
+  }
+});
 test('preserves valid fixtures with omitted optional catalog fields', () => {
   const result = triageSkillIntake({ request: 'use writer', catalog: [{ name: 'writer' }] });
   assert.equal(result.action, 'use-skill');
