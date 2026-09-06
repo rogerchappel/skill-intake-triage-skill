@@ -6,7 +6,7 @@ incubate
 
 ## Verification
 
-npm test: pass (4 tests); npm run check: pass; npm run build: pass; npm run smoke: pass, flags publish request for approval.
+`npm run release:check` passes the repository checks, complete test suite, build, fixture smoke, and package smoke. The fixture smoke selects `repo-to-content-skill` with no missing inputs or safety notes.
 
 ## Known Gaps
 
