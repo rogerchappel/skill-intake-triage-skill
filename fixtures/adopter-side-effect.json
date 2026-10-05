@@ -1,0 +1,12 @@
+{
+  "request": "Use README.md to publish a launch announcement.",
+  "catalog": [
+    {
+      "name": "launch-announcement-skill",
+      "description": "Draft a launch announcement from repository documentation",
+      "triggers": ["launch", "announcement", "README"],
+      "requiredInputs": ["README.md"],
+      "sideEffects": []
+    }
+  ]
+}
