@@ -4,5 +4,5 @@
 - [x] Detect missing inputs
 - [x] Flag side-effect language
 - [x] Render CLI report
-- [ ] Add more real-world fixtures after first adopter feedback
+- [x] Add representative adopter-feedback fixtures and regression tests
 - [ ] Add JSON schema exports for downstream validators
