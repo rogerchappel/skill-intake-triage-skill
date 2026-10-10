@@ -4,7 +4,7 @@
   "description": "Local-first intake triage for choosing reusable agent skills safely.",
   "type": "module",
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "bin": {
     "skill-intake-triage-skill": "bin/skill-intake-triage-skill.js"
