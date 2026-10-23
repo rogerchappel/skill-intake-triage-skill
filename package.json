@@ -42,6 +42,7 @@
     "src",
     "fixtures",
     "scripts",
+    "docs",
     "SKILL.md",
     "README.md",
     "LICENSE",
