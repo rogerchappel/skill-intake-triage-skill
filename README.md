@@ -34,6 +34,10 @@ are `description` (string), `triggers` and `requiredInputs` (arrays of non-empty
 strings), and `sideEffects` (a string or an array of non-empty strings). The
 three array fields may be omitted or set to `[]`; blank or whitespace-only array
 entries are invalid. Unknown fields are ignored.
+A versioned JSON Schema for downstream validators is available at `skill-intake-triage-skill/schemas/intake-fixture.v1.schema.json` (also importable via `skill-intake-triage-skill/schemas/intake-fixture.v1.schema.json`). It models the accepted fields while allowing unknown properties, matching runtime validation.
+
+A versioned JSON Schema for downstream validators is available at `schemas/intake-fixture.v1.schema.json` (also importable via `skill-intake-triage-skill/schemas/intake-fixture.v1.schema.json`). It models the accepted fields while allowing unknown properties, matching runtime validation.
+
 The library throws `InvalidFixtureError` with the first invalid field path when
 this schema is not met; the CLI prints the same deterministic diagnostic.
 

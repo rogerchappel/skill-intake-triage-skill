@@ -5,4 +5,4 @@
 - [x] Flag side-effect language
 - [x] Render CLI report
 - [x] Add representative adopter-feedback fixtures and regression tests
-- [ ] Add JSON schema exports for downstream validators
+- [x] Add JSON schema exports for downstream validators

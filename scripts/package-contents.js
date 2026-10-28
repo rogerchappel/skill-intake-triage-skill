@@ -5,6 +5,8 @@ export const requiredPackageFiles = [
   'package/package.json',
   'package/bin/skill-intake-triage-skill.js',
   'package/src/index.js',
+  'package/schemas/intake-fixture.v1.schema.json',
+  'package/schemas/intake-fixture.v1.schema.json',
   'package/docs/RELEASE_CANDIDATE.md',
   'package/docs/RELEASE_CHECKLIST.md',
   'package/docs/SAFETY.md'
