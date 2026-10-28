@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rogerchappel/skill-intake-triage-skill/blob/main/schemas/intake-fixture.v1.schema.json",
+  "title": "Skill intake fixture",
+  "description": "Input accepted by triageSkillIntake.",
+  "type": "object",
+  "required": ["request", "catalog"],
+  "properties": {
+    "request": { "type": "string" },
+    "catalog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "pattern": "\\S" },
+          "description": { "type": "string" },
+          "triggers": { "$ref": "#/$defs/nonEmptyStrings" },
+          "requiredInputs": { "$ref": "#/$defs/nonEmptyStrings" },
+          "sideEffects": {
+            "oneOf": [
+              { "type": "string" },
+              { "$ref": "#/$defs/nonEmptyStrings" }
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "nonEmptyStrings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "pattern": "\\S" }
+    }
+  }
+}

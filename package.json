@@ -10,7 +10,8 @@
     "skill-intake-triage-skill": "bin/skill-intake-triage-skill.js"
   },
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./schemas/intake-fixture.v1.schema.json": "./schemas/intake-fixture.v1.schema.json"
   },
   "scripts": {
     "test": "node --test",
@@ -46,6 +47,8 @@
     "SKILL.md",
     "README.md",
     "LICENSE",
-    "SECURITY.md"
+    "SECURITY.md",
+    "schemas",
+    "schemas"
   ]
 }
