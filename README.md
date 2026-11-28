@@ -71,23 +71,15 @@ Action gating is conservative: affirmative requests to apply, approve, install, 
 
 See `docs/RELEASE_CANDIDATE.md` and `docs/RELEASE_CHECKLIST.md` for the current readiness notes.
 
-## Local Verification
+## Verification
+
+Run the same release checks used by CI:
 
 ```sh
-npm run check
-npm test
-npm run smoke
-npm run package:smoke
+npm ci
 npm run release:check
 ```
 
-`npm run package:smoke` inspects the `npm pack` manifest and fails when a
-required published artifact, including `SKILL.md`, is missing.
-
-## Verification
-
-```sh
-npm test
-npm run check --if-present
-npm run smoke --if-present
-```
+`release:check` runs the project check, test suite, build, CLI smoke test, and
+package smoke test. The package smoke test inspects the `npm pack` manifest and
+fails when a required published artifact, including `SKILL.md`, is missing.
